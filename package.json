@@ -1,0 +1,25 @@
+{
+  "name": "tp2",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/CastilloFrancisco/tp3dai#readme",
+  "bugs": {
+    "url": "https://github.com/CastilloFrancisco/tp3dai/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CastilloFrancisco/tp3dai.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^1.14.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
