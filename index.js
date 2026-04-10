@@ -28,6 +28,29 @@ app.get('/saludar/:nombre', (req, res) => {             // EndPoint "/saludar"
     res.send(`Hola ${req.params.nombre}👋`);
 })
 
+app.get('/validarfecha/:ano/:mes/:dia', (req, res) => {
+
+    let dia = req.params.dia;
+    let mes = req.params.mes;
+    let anio = req.params.ano;
+
+    let fecha = Date.parse(`${anio}-${mes - 1}-${dia}`)
+
+    let nCodigo = '400'
+
+    if (fecha.getDate() == dia && fecha.getMonth() == mes - 1 && fecha.getYear() == anio) { //getDate no existe
+
+        nCodigo = '200'
+
+        app.get('/saludar/:nombre', (req, res) => {             // EndPoint "/saludar"
+            res.status(200).send(`Hola ${req.params.nombre}👋`);
+        })
+
+    }
+
+
+})
+
 //
 // Inicio el Server y lo pongo a escuchar.
 //
