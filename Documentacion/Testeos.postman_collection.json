@@ -1,0 +1,71 @@
+{
+	"info": {
+		"_postman_id": "cd79b443-836f-4f9f-be17-c898c6ea5609",
+		"name": "Testeos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Estoy Respondiendo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000",
+					"host": [
+						"localhost"
+					],
+					"port": "3000"
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Saludar Nombre Copy",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/saludar/:nombre",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"saludar",
+						":nombre"
+					],
+					"variable": [
+						{
+							"key": "nombre",
+							"value": "Brunubi"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Validar Fecha",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/validarfecha/2000/1/1",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"validarfecha",
+						"2000",
+						"1",
+						"1"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

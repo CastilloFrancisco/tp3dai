@@ -1,0 +1,125 @@
+{
+	"info": {
+		"_postman_id": "a29eafc5-a067-4d32-b65c-b23df303e04e",
+		"name": "Matematica",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Sumas P",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/matematica/sumar?n1=2&n2=3",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"matematica",
+						"sumar"
+					],
+					"query": [
+						{
+							"key": "n1",
+							"value": "2"
+						},
+						{
+							"key": "n2",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Restar P",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/matematica/restar?n1=2&n2=3",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"matematica",
+						"restar"
+					],
+					"query": [
+						{
+							"key": "n1",
+							"value": "2"
+						},
+						{
+							"key": "n2",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Multiplicar P",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/matematica/multiplicar?n1=2&n2=23",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"matematica",
+						"multiplicar"
+					],
+					"query": [
+						{
+							"key": "n1",
+							"value": "2"
+						},
+						{
+							"key": "n2",
+							"value": "23"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Dividir P",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/matematica/dividir?n1=5&n2=5",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"matematica",
+						"dividir"
+					],
+					"query": [
+						{
+							"key": "n1",
+							"value": "5"
+						},
+						{
+							"key": "n2",
+							"value": "5"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

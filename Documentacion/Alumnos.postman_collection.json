@@ -1,0 +1,131 @@
+{
+	"info": {
+		"_postman_id": "165d2fbf-25bb-4484-ad0d-d2e75ec0cf0d",
+		"name": "Alumnos",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Devolver Array",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/alumnos",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"alumnos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Alumnos por DNI",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/alumnos/22888444",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"alumnos",
+						"22888444"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Agregar Alumno",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "Bruno",
+							"type": "text"
+						},
+						{
+							"key": "dni",
+							"value": "49",
+							"type": "text"
+						},
+						{
+							"key": "edad",
+							"value": "17",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/alumnos",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"alumnos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Request",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "dni",
+							"value": "",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost:3000/alumnos",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"alumnos"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

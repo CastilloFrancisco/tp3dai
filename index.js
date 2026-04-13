@@ -27,15 +27,17 @@ app.get('/saludar/:nombre', (req, res) => {             // EndPoint "/saludar"
     return res.send(`Hola ${req.params.nombre}👋`);
 })
 
-app.get('/validarfecha/:ano/:mes/:dia', (req, res) => {
+app.get('/validarfecha/:anio/:mes/:dia', (req, res) => {
 
-    let dia = parseInt(req.params.dia);
-    let mes = parseInt(req.params.mes);
-    let anio = parseInt(req.params.ano);
+    let dia = req.params.dia;
+    let mes = req.params.mes;
+    let anio = req.params.anio;
 
-    let fecha = new Date(anio, mes - 1, dia);
 
-    if (fecha.getDate() == dia && fecha.getMonth() == mes - 1 && fecha.getFullYear() == anio) {
+    const fechaStr = `${anio}-${mes}-${dia}`;
+    const timestamp = Date.parse(fechaStr);
+
+    if (!isNaN(timestamp)) {
 
         return res.status(200).send(`Fecha válida`);
 
@@ -45,9 +47,9 @@ app.get('/validarfecha/:ano/:mes/:dia', (req, res) => {
 })
 
 
-import { sumar, restar, multiplicar, dividir } from "./modules/matematica.js"
+import { sumar, restar, multiplicar, dividir } from "./src/modules/matematica.js"
 
-app.get(`/matematica/sumar?n1={numero}&n2={numero}`, (req, res) => {
+app.get(`/matematica/sumar`, (req, res) => {
 
     let resultado = sumar(
         parseInt(req.query.n1),
@@ -56,7 +58,7 @@ app.get(`/matematica/sumar?n1={numero}&n2={numero}`, (req, res) => {
 
     return res.status(200).send(resultado);
 })
-app.get(`/matematica/restar?n1={numero}&n2={numero}`, (req, res) => {
+app.get(`/matematica/restar`, (req, res) => {
 
     let resultado = restar(
         parseInt(req.query.n1),
@@ -65,7 +67,7 @@ app.get(`/matematica/restar?n1={numero}&n2={numero}`, (req, res) => {
 
     return res.status(200).send(resultado);
 })
-app.get(`/matematica/multiplicar?n1={numero}&n2={numero}`, (req, res) => {
+app.get(`/matematica/multiplicar`, (req, res) => {
 
     let resultado = multiplicar(
         parseInt(req.query.n1),
@@ -74,7 +76,7 @@ app.get(`/matematica/multiplicar?n1={numero}&n2={numero}`, (req, res) => {
 
     return res.status(200).send(resultado);
 })
-app.get(`/matematica/dividir?n1={numero}&n2={numero}`, (req, res) => {
+app.get(`/matematica/dividir`, (req, res) => {
 
     let num1 = parseInt(req.query.n1)
     let num2 = parseInt(req.query.n2)
@@ -90,11 +92,11 @@ app.get(`/matematica/dividir?n1={numero}&n2={numero}`, (req, res) => {
 })
 
 
-import { OMDBSearchByPage, OMDBSearchComplete, OMDBGetByImdbID } from "./modules/omdb-wrapper.js"
+import { OMDBSearchByPage, OMDBSearchComplete, OMDBGetByImdbID } from "./src/modules/OMDBWrapper.js"
 
-app.get(`/omdb/searchbypage?search={texto}&p={pagina}`, async (req, res) => {
+app.get(`/omdb/searchbypage`, async (req, res) => {
+
     try {
-
         let respuesta = await OMDBSearchByPage(
             req.query.search,
             req.query.p
@@ -112,7 +114,7 @@ app.get(`/omdb/searchbypage?search={texto}&p={pagina}`, async (req, res) => {
     }
 })
 
-app.get(`/omdb/searchcomplete?search={texto}`, async (req, res) => {
+app.get(`/omdb/searchcomplete`, async (req, res) => {
 
     try {
 
@@ -132,7 +134,7 @@ app.get(`/omdb/searchcomplete?search={texto}`, async (req, res) => {
     }
 })
 
-app.get(`/omdb/getbyomdbid?imdbID={imdb}`, async (req, res) => {
+app.get(`/omdb/getbyomdbid`, async (req, res) => {
 
     try {
 
@@ -151,16 +153,19 @@ app.get(`/omdb/getbyomdbid?imdbID={imdb}`, async (req, res) => {
 })
 
 
-import Alumno from "./models/alumno.js"
-    const alumnosArray = [];
+import Alumno from "./src/models/alumno.js"
+const alumnosArray = [];
 
-    alumnosArray.push(new Alumno("Esteban Dido", "22888444", 20));
-    alumnosArray.push(new Alumno("Matias Queroso", "28946255", 51));
-    alumnosArray.push(new Alumno("Elba Calao", "32623391", 18));
+alumnosArray.push(new Alumno("Esteban Dido", "22888444", 20));
+alumnosArray.push(new Alumno("Matias Queroso", "28946255", 51));
+alumnosArray.push(new Alumno("Elba Calao", "32623391", 18));
 
+app.use(express.json()); 
+app.use(express.urlencoded({ extended: true }));
 
 app.get(`/alumnos`, async (req, res) => {
 
+    
     const alumnosArray = [];
 
     alumnosArray.push(new Alumno("Esteban Dido", "22888444", 20));
@@ -168,14 +173,15 @@ app.get(`/alumnos`, async (req, res) => {
     alumnosArray.push(new Alumno("Elba Calao", "32623391", 18));
 
     return res.status(200).send(alumnosArray);
-})
+}
+)
 
 app.get(`/alumnos/:dni`, async (req, res) => {
 
     let DNI = req.params.dni;
     let alumnoEncontrado = null
 
-    alumnoEncontrado = await alumnosArray.find((alum) => alum.strDNI == DNI) 
+    alumnoEncontrado = await alumnosArray.find((alum) => alum.strDNI == DNI)
 
     if (alumnoEncontrado != null) {
 
@@ -188,33 +194,30 @@ app.get(`/alumnos/:dni`, async (req, res) => {
 
 app.post('/alumnos', async (req, res) => {
 
-    const { username, dni, edad } = req.body;
+        const { username, dni, edad } = req.body;
 
     const nuevoAlumno = new Alumno(username, dni, edad);
-
-    alumnosArray.push(nuevoAlumno); // 👈 lo que pide la consigna
-
+    alumnosArray.push(nuevoAlumno);
     return res.status(201).json(nuevoAlumno);
 });
 
-app.delete(`/alumnos`, async (req, res) => {
+app.delete('/alumnos', (req, res) => {
 
-    const { dni } = req.body;
+    const { dni } = req.body; 
 
-    let index = alumnosArray.findIndex((alum) => alum.strDNI == dni);
+    if (!dni) {
+        return res.status(400).send("No está el dni");
+    }
+
+    const index = alumnosArray.findIndex(alum => alum.strDNI === dni);
 
     if (index !== -1) {
-
-        alumnosArray.splice(index, 1);
-
-        return res.status(200).send('Alumno eliminado');
-
+        const eliminado = alumnosArray.splice(index, 1);
+        return res.status(200).send("Alumno eliminado");
     } else {
-
-        return res.status(404).send('No se encontró el alumno');
-
+        return res.status(404).send("No se encontró el alumno con ese DNI");
     }
-})
+});
 //
 // Inicio el Server y lo pongo a escuchar.
 //

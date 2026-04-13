@@ -1,0 +1,88 @@
+{
+	"info": {
+		"_postman_id": "820382e9-1409-4cb8-96bc-427e82736381",
+		"name": "OMDB",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SearchByPage",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/omdb/searchbypage?search=shrek&p=3",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"omdb",
+						"searchbypage"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "shrek"
+						},
+						{
+							"key": "p",
+							"value": "3"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SearchComplete",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/omdb/searchcomplete?search=timba",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"omdb",
+						"searchcomplete"
+					],
+					"query": [
+						{
+							"key": "search",
+							"value": "timba"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GetByOmdbID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:3000/omdb/getbyomdbid?imdbID=tt0492028",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"omdb",
+						"getbyomdbid"
+					],
+					"query": [
+						{
+							"key": "imdbID",
+							"value": "tt0492028"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
