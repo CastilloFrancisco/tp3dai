@@ -4,6 +4,10 @@
 import express from "express"; // hacer npm i express
 import cors from "cors";    // hacer npm i cors
 import axios from "axios";
+import { OMDBSearchByPage, OMDBSearchComplete, OMDBGetByImdbID } from "./src/modules/OMDBWrapper.js"
+import Alumno from "./src/models/alumno.js"
+import { sumar, restar, multiplicar, dividir } from "./src/modules/matematica.js"
+
 
 const app = express();
 const port = 3000;              // El puerto 3000 (http://localhost:3000)
@@ -24,7 +28,13 @@ app.get('/', (req, res) => {                // EndPoint "/"
 })
 
 app.get('/saludar/:nombre', (req, res) => {             // EndPoint "/saludar"
-    return res.send(`Hola ${req.params.nombre}👋`);
+
+    let strNombre = req.params.nombre
+    if (ValidacionesHelper.getStringOrDefault(strNombre, 0) == 0) {
+        return res.status(400).send('Falló algo :(');
+    }
+
+    return res.send(`Hola ${strNombre}👋`);
 })
 
 app.get('/validarfecha/:anio/:mes/:dia', (req, res) => {
@@ -33,24 +43,33 @@ app.get('/validarfecha/:anio/:mes/:dia', (req, res) => {
     let mes = req.params.mes;
     let anio = req.params.anio;
 
+    if (ValidacionesHelper.getIntegerOrDefault(parseInt(anio, 'error')) == 'error' ||
+        ValidacionesHelper.getIntegerOrDefault(parseInt(mes, 'error')) == 'error' ||
+        ValidacionesHelper.getIntegerOrDefault(parseInt(dia, 'error') == 'error')) {
+
+        return res.status(400).send('Corregí los parámetros');
+    }
 
     const fechaStr = `${anio}-${mes}-${dia}`;
-    const timestamp = Date.parse(fechaStr);
+    const fecha = Date.parse(fechaStr);
 
-    if (!isNaN(timestamp)) {
+    if (ValidacionesHelper.getDateOrDefault(fecha, 'error') == 'error') {
 
         return res.status(200).send(`Fecha válida`);
 
     } else {
         return res.status(400).send('Fecha inválida');
     }
+
+
 })
-
-
-import { sumar, restar, multiplicar, dividir } from "./src/modules/matematica.js"
 
 app.get(`/matematica/sumar`, (req, res) => {
 
+    if (ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n1, 'error')) == 'error' ||
+        ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n2, 'error')) == 'error') {
+        return res.status(400).send('Están mal las cosas');
+    }
     let resultado = sumar(
         parseInt(req.query.n1),
         parseInt(req.query.n2)
@@ -60,6 +79,11 @@ app.get(`/matematica/sumar`, (req, res) => {
 })
 app.get(`/matematica/restar`, (req, res) => {
 
+    if (ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n1, 'error')) == 'error' ||
+        ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n2, 'error')) == 'error') {
+        return res.status(400).send('Están mal las cosas');
+    }
+
     let resultado = restar(
         parseInt(req.query.n1),
         parseInt(req.query.n2)
@@ -68,7 +92,10 @@ app.get(`/matematica/restar`, (req, res) => {
     return res.status(200).send(resultado);
 })
 app.get(`/matematica/multiplicar`, (req, res) => {
-
+    if (ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n1, 'error')) == 'error' ||
+        ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n2, 'error')) == 'error') {
+        return res.status(400).send('Están mal las cosas');
+    }
     let resultado = multiplicar(
         parseInt(req.query.n1),
         parseInt(req.query.n2)
@@ -80,6 +107,10 @@ app.get(`/matematica/dividir`, (req, res) => {
 
     let num1 = parseInt(req.query.n1)
     let num2 = parseInt(req.query.n2)
+    if (ValidacionesHelper.getIntegerOrDefault(parseInt(num1, 'error')) == 'error' ||
+        ValidacionesHelper.getIntegerOrDefault(parseInt(num2, 'error')) == 'error') {
+        return res.status(400).send('Están mal las cosas');
+    }
     if (num2 != 0) {
 
         let resultado = dividir(num1, num2);
@@ -92,10 +123,13 @@ app.get(`/matematica/dividir`, (req, res) => {
 })
 
 
-import { OMDBSearchByPage, OMDBSearchComplete, OMDBGetByImdbID } from "./src/modules/OMDBWrapper.js"
 
 app.get(`/omdb/searchbypage`, async (req, res) => {
 
+    if (ValidacionesHelper.getStringOrDefault(req.query.search, 0) == 0 || 
+        ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.p, 'error')) == 'error') {
+        return res.status(400).send('Falló algo :(');
+    }
     try {
         let respuesta = await OMDBSearchByPage(
             req.query.search,
@@ -115,7 +149,9 @@ app.get(`/omdb/searchbypage`, async (req, res) => {
 })
 
 app.get(`/omdb/searchcomplete`, async (req, res) => {
-
+    if (ValidacionesHelper.getStringOrDefault(req.query.search, 0) == 0) {
+        return res.status(400).send('Falló algo :(');
+    }
     try {
 
         let respuesta = await OMDBSearchComplete(
@@ -135,7 +171,9 @@ app.get(`/omdb/searchcomplete`, async (req, res) => {
 })
 
 app.get(`/omdb/getbyomdbid`, async (req, res) => {
-
+    if (ValidacionesHelper.getStringOrDefault(req.query.search, 0) == 0) {
+        return res.status(400).send('Falló algo :(');
+    }
     try {
 
         let respuesta = await OMDBGetByImdbID(
@@ -153,19 +191,18 @@ app.get(`/omdb/getbyomdbid`, async (req, res) => {
 })
 
 
-import Alumno from "./src/models/alumno.js"
 const alumnosArray = [];
 
 alumnosArray.push(new Alumno("Esteban Dido", "22888444", 20));
 alumnosArray.push(new Alumno("Matias Queroso", "28946255", 51));
 alumnosArray.push(new Alumno("Elba Calao", "32623391", 18));
 
-app.use(express.json()); 
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get(`/alumnos`, async (req, res) => {
 
-    
+
     const alumnosArray = [];
 
     alumnosArray.push(new Alumno("Esteban Dido", "22888444", 20));
@@ -181,6 +218,10 @@ app.get(`/alumnos/:dni`, async (req, res) => {
     let DNI = req.params.dni;
     let alumnoEncontrado = null
 
+    if (ValidacionesHelper.getIntegerOrDefault(parseInt(DNI, 'error')) == 'error') {
+        return res.status(400).send('Están mal las cosas');
+    }
+
     alumnoEncontrado = await alumnosArray.find((alum) => alum.strDNI == DNI)
 
     if (alumnoEncontrado != null) {
@@ -194,7 +235,7 @@ app.get(`/alumnos/:dni`, async (req, res) => {
 
 app.post('/alumnos', async (req, res) => {
 
-        const { username, dni, edad } = req.body;
+    const { username, dni, edad } = req.body;
 
     const nuevoAlumno = new Alumno(username, dni, edad);
     alumnosArray.push(nuevoAlumno);
@@ -203,7 +244,7 @@ app.post('/alumnos', async (req, res) => {
 
 app.delete('/alumnos', (req, res) => {
 
-    const { dni } = req.body; 
+    const { dni } = req.body;
 
     if (!dni) {
         return res.status(400).send("No está el dni");
@@ -225,4 +266,5 @@ app.delete('/alumnos', (req, res) => {
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
+
 
