@@ -7,6 +7,7 @@ import axios from "axios";
 import { OMDBSearchByPage, OMDBSearchComplete, OMDBGetByImdbID } from "./src/modules/OMDBWrapper.js"
 import Alumno from "./src/models/alumno.js"
 import { sumar, restar, multiplicar, dividir } from "./src/modules/matematica.js"
+import ValidacionesHelper from "./src/modules/validaciones-helper.js";
 
 
 const app = express();
@@ -38,31 +39,24 @@ app.get('/saludar/:nombre', (req, res) => {             // EndPoint "/saludar"
 })
 
 app.get('/validarfecha/:anio/:mes/:dia', (req, res) => {
+    const anio = ValidacionesHelper.getIntegerOrDefault(req.params.anio, 0);
+    const mes = ValidacionesHelper.getIntegerOrDefault(req.params.mes, 0);
+    const dia = ValidacionesHelper.getIntegerOrDefault(req.params.dia, 0);
 
-    let dia = req.params.dia;
-    let mes = req.params.mes;
-    let anio = req.params.anio;
 
-    if (ValidacionesHelper.getIntegerOrDefault(parseInt(anio, 'error')) == 'error' ||
-        ValidacionesHelper.getIntegerOrDefault(parseInt(mes, 'error')) == 'error' ||
-        ValidacionesHelper.getIntegerOrDefault(parseInt(dia, 'error') == 'error')) {
-
+    if (anio === 0 || mes === 0 || dia === 0) {
         return res.status(400).send('Corregí los parámetros');
     }
 
-    const fechaStr = `${anio}-${mes}-${dia}`;
-    const fecha = Date.parse(fechaStr);
 
-    if (ValidacionesHelper.getDateOrDefault(fecha, 'error') == 'error') {
+    const fecha = new Date(`${anio}-${mes}-${dia}`);
 
-        return res.status(200).send(`Fecha válida`);
-
-    } else {
+    if (isNaN(fecha.getTime())) {
         return res.status(400).send('Fecha inválida');
     }
 
-
-})
+    return res.status(200).send('Fecha válida');
+});
 
 app.get(`/matematica/sumar`, (req, res) => {
 
@@ -126,7 +120,7 @@ app.get(`/matematica/dividir`, (req, res) => {
 
 app.get(`/omdb/searchbypage`, async (req, res) => {
 
-    if (ValidacionesHelper.getStringOrDefault(req.query.search, 0) == 0 || 
+    if (ValidacionesHelper.getStringOrDefault(req.query.search, 0) == 0 ||
         ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.p, 'error')) == 'error') {
         return res.status(400).send('Falló algo :(');
     }
