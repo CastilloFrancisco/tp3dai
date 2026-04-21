@@ -7,7 +7,7 @@ import axios from "axios";
 import { OMDBSearchByPage, OMDBSearchComplete, OMDBGetByImdbID } from "./src/modules/OMDBWrapper.js"
 import Alumno from "./src/models/alumno.js"
 import { sumar, restar, multiplicar, dividir } from "./src/modules/matematica.js"
-import ValidacionesHelper from "./src/modules/validaciones-helper.js";
+import ValidacionesHelper from "./src/modules/ValiacionesHelper.js";
 
 
 const app = express();
