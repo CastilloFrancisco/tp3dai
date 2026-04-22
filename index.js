@@ -8,7 +8,7 @@ import { OMDBSearchByPage, OMDBSearchComplete, OMDBGetByImdbID } from "./src/mod
 import Alumno from "./src/models/alumno.js"
 import { sumar, restar, multiplicar, dividir } from "./src/modules/matematica.js"
 import ValidacionesHelper from "./src/modules/ValiacionesHelper.js";
-
+import DateTimeHelper from './src/modules/datetime-helper.js';
 
 const app = express();
 const port = 3000;              // El puerto 3000 (http://localhost:3000)
@@ -58,63 +58,65 @@ app.get('/validarfecha/:anio/:mes/:dia', (req, res) => {
     return res.status(200).send('Fecha válida');
 });
 
-app.get(`/matematica/sumar`, (req, res) => {
+app.get('/matematica/sumar', (req, res) => {
 
-    if (ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n1, 'error')) == 'error' ||
-        ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n2, 'error')) == 'error') {
-        return res.status(400).send('Están mal las cosas');
-    }
-    let resultado = sumar(
-        parseInt(req.query.n1),
-        parseInt(req.query.n2)
-    );
+    const n1 = ValidacionesHelper.getIntegerOrDefault(req.query.n1, null);
+    const n2 = ValidacionesHelper.getIntegerOrDefault(req.query.n2, null);
 
-    return res.status(200).send(resultado);
-})
-app.get(`/matematica/restar`, (req, res) => {
-
-    if (ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n1, 'error')) == 'error' ||
-        ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n2, 'error')) == 'error') {
-        return res.status(400).send('Están mal las cosas');
+    if (n1 === null || n2 === null) {
+        return res.status(400).send('n1 y n2 deben ser números enteros');
     }
 
-    let resultado = restar(
-        parseInt(req.query.n1),
-        parseInt(req.query.n2)
-    );
+    let resultado = sumar(n1, n2);
 
-    return res.status(200).send(resultado);
-})
-app.get(`/matematica/multiplicar`, (req, res) => {
-    if (ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n1, 'error')) == 'error' ||
-        ValidacionesHelper.getIntegerOrDefault(parseInt(req.query.n2, 'error')) == 'error') {
-        return res.status(400).send('Están mal las cosas');
-    }
-    let resultado = multiplicar(
-        parseInt(req.query.n1),
-        parseInt(req.query.n2)
-    );
+    return res.status(200).send(String(resultado));
+});
 
-    return res.status(200).send(resultado);
-})
-app.get(`/matematica/dividir`, (req, res) => {
+app.get('/matematica/restar', (req, res) => {
 
-    let num1 = parseInt(req.query.n1)
-    let num2 = parseInt(req.query.n2)
-    if (ValidacionesHelper.getIntegerOrDefault(parseInt(num1, 'error')) == 'error' ||
-        ValidacionesHelper.getIntegerOrDefault(parseInt(num2, 'error')) == 'error') {
-        return res.status(400).send('Están mal las cosas');
-    }
-    if (num2 != 0) {
+    const n1 = ValidacionesHelper.getIntegerOrDefault(req.query.n1, null);
+    const n2 = ValidacionesHelper.getIntegerOrDefault(req.query.n2, null);
 
-        let resultado = dividir(num1, num2);
-        return res.status(200).send(resultado);
-    } else {
-
-        return res.status(400).send('no se puede dividir por 0');
+    if (n1 === null || n2 === null) {
+        return res.status(400).send('n1 y n2 deben ser números enteros');
     }
 
-})
+    let resultado = restar(n1, n2);
+
+    return res.status(200).send(String(resultado));
+});
+
+app.get('/matematica/multiplicar', (req, res) => {
+
+    const n1 = ValidacionesHelper.getIntegerOrDefault(req.query.n1, null);
+    const n2 = ValidacionesHelper.getIntegerOrDefault(req.query.n2, null);
+
+    if (n1 === null || n2 === null) {
+        return res.status(400).send('n1 y n2 deben ser números enteros');
+    }
+
+    let resultado = sumar(n1, n2);
+
+    return res.status(200).send(String(resultado));
+});
+
+app.get('/matematica/dividir', (req, res) => {
+
+    const n1 = ValidacionesHelper.getIntegerOrDefault(req.query.n1, null);
+    const n2 = ValidacionesHelper.getIntegerOrDefault(req.query.n2, null);
+
+    if (n1 === null || n2 === null) {
+        return res.status(400).send('n1 y n2 deben ser números enteros');
+    }
+    if (n2 === 0) {
+        return res.status(400).send('n2 no puede ser 0');
+    }
+    let resultado = dividir(n1, n2);
+
+    return res.status(200).send(String(resultado));
+});
+
+
 
 
 
@@ -209,49 +211,66 @@ app.get(`/alumnos`, async (req, res) => {
 
 app.get(`/alumnos/:dni`, async (req, res) => {
 
-    let DNI = req.params.dni;
-    let alumnoEncontrado = null
+const dni = ValidacionesHelper.getStringOrDefault(req.params.dni, '');
 
-    if (ValidacionesHelper.getIntegerOrDefault(parseInt(DNI, 'error')) == 'error') {
-        return res.status(400).send('Están mal las cosas');
+    if (dni === '') {
+        return res.status(400).send('DNI inválido');
     }
 
-    alumnoEncontrado = await alumnosArray.find((alum) => alum.strDNI == DNI)
+    const alumnoEncontrado = alumnosArray.find(alum => alum.strDNI === dni);
 
-    if (alumnoEncontrado != null) {
-
+    if (alumnoEncontrado) {
         return res.status(200).send(alumnoEncontrado);
-
     } else {
-        return res.status(400).send('No se encontró');
+        return res.status(404).send('No se encontró');
     }
+
 })
 
 app.post('/alumnos', async (req, res) => {
 
-    const { username, dni, edad } = req.body;
+    const username = ValidacionesHelper.getStringOrDefault(req.body.username, '');
+    const dni = ValidacionesHelper.getStringOrDefault(req.body.dni, '');
+    const edad = ValidacionesHelper.getIntegerOrDefault(req.body.edad, 0);
+
+    if (username === '' || dni === '' || edad <= 0) {
+        return res.status(400).send('username, dni y edad son obligatorios');
+    }
 
     const nuevoAlumno = new Alumno(username, dni, edad);
     alumnosArray.push(nuevoAlumno);
-    return res.status(201).json(nuevoAlumno);
+
+    return res.status(201).send(nuevoAlumno);
 });
 
 app.delete('/alumnos', (req, res) => {
 
-    const { dni } = req.body;
+    const dni = ValidacionesHelper.getStringOrDefault(req.body.dni, '');
 
-    if (!dni) {
-        return res.status(400).send("No está el dni");
+    if (dni === '') {
+        return res.status(400).send('DNI requerido');
     }
 
     const index = alumnosArray.findIndex(alum => alum.strDNI === dni);
 
     if (index !== -1) {
-        const eliminado = alumnosArray.splice(index, 1);
-        return res.status(200).send("Alumno eliminado");
+        alumnosArray.splice(index, 1);
+        return res.status(200).send('Alumno eliminado');
     } else {
-        return res.status(404).send("No se encontró el alumno con ese DNI");
+        return res.status(404).send('No se encontró el alumno');
     }
+
+});
+
+app.get('/fechas/isDate', (req, res) => {
+
+  const fecha = ValidacionesHelper.getDateOrDefault(req.query.fecha, null);
+
+  if (!DateTimeHelper.isDate(fecha)) {
+    return res.status(400).send('Fecha inválida');
+  }
+
+  return res.status(200).send({ valido: true });
 });
 //
 // Inicio el Server y lo pongo a escuchar.
