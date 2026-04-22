@@ -24,11 +24,11 @@ app.use(express.json()); // Middleware para parsear y comprender JSON
 // Aca pongo todos los EndPoints
 //
 
-app.get('/', (req, res) => {                // EndPoint "/"
+app.get('/', (req, res) => {    // EndPoint "/"
     return res.send('Ya estoy respondiendo!');
 })
 
-app.get('/saludar/:nombre', (req, res) => {             // EndPoint "/saludar"
+app.get('/saludar/:nombre', (req, res) => {       // EndPoint "/saludar"
 
     let strNombre = req.params.nombre
     if (ValidacionesHelper.getStringOrDefault(strNombre, 0) == 0) {
@@ -39,19 +39,18 @@ app.get('/saludar/:nombre', (req, res) => {             // EndPoint "/saludar"
 })
 
 app.get('/validarfecha/:anio/:mes/:dia', (req, res) => {
+
     const anio = ValidacionesHelper.getIntegerOrDefault(req.params.anio, 0);
     const mes = ValidacionesHelper.getIntegerOrDefault(req.params.mes, 0);
     const dia = ValidacionesHelper.getIntegerOrDefault(req.params.dia, 0);
-
 
     if (anio === 0 || mes === 0 || dia === 0) {
         return res.status(400).send('Corregí los parámetros');
     }
 
+    const fecha = new Date(anio, mes - 1, dia);
 
-    const fecha = new Date(`${anio}-${mes}-${dia}`);
-
-    if (isNaN(fecha.getTime())) {
+    if (!DateTimeHelper.isDate(fecha) || fecha.getFullYear() !== anio || fecha.getMonth() !== mes - 1 || fecha.getDate() !== dia) {
         return res.status(400).send('Fecha inválida');
     }
 
@@ -95,7 +94,7 @@ app.get('/matematica/multiplicar', (req, res) => {
         return res.status(400).send('n1 y n2 deben ser números enteros');
     }
 
-    let resultado = sumar(n1, n2);
+    let resultado = multiplicar(n1, n2);
 
     return res.status(200).send(String(resultado));
 });
@@ -167,16 +166,17 @@ app.get(`/omdb/searchcomplete`, async (req, res) => {
 })
 
 app.get(`/omdb/getbyomdbid`, async (req, res) => {
-    if (ValidacionesHelper.getStringOrDefault(req.query.search, 0) == 0) {
+
+    const imdbID = ValidacionesHelper.getStringOrDefault(req.query.imdbID, '');
+    if (imdbID === '') {
         return res.status(400).send('Falló algo :(');
     }
     try {
 
-        let respuesta = await OMDBGetByImdbID(
-            req.query.imdbID,
-        );
+        let respuesta = await OMDBGetByImdbID(imdbID);
 
         return res.status(200).send(respuesta);
+
     } catch {
         return res.status(400).json({
             respuesta: false,
@@ -184,7 +184,7 @@ app.get(`/omdb/getbyomdbid`, async (req, res) => {
             datos: [],
         });
     }
-})
+});
 
 
 const alumnosArray = [];
@@ -198,20 +198,13 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get(`/alumnos`, async (req, res) => {
 
-
-    const alumnosArray = [];
-
-    alumnosArray.push(new Alumno("Esteban Dido", "22888444", 20));
-    alumnosArray.push(new Alumno("Matias Queroso", "28946255", 51));
-    alumnosArray.push(new Alumno("Elba Calao", "32623391", 18));
-
     return res.status(200).send(alumnosArray);
 }
 )
 
-app.get(`/alumnos/:dni`, async (req, res) => {
+app.get('/alumnos/:dni', (req, res) => {
 
-const dni = ValidacionesHelper.getStringOrDefault(req.params.dni, '');
+    const dni = ValidacionesHelper.getStringOrDefault(req.params.dni, '');
 
     if (dni === '') {
         return res.status(400).send('DNI inválido');
@@ -264,14 +257,89 @@ app.delete('/alumnos', (req, res) => {
 
 app.get('/fechas/isDate', (req, res) => {
 
-  const fecha = ValidacionesHelper.getDateOrDefault(req.query.fecha, null);
+    const fecha = ValidacionesHelper.getDateOrDefault(req.query.fecha, null);
 
-  if (!DateTimeHelper.isDate(fecha)) {
-    return res.status(400).send('Fecha inválida');
-  }
+    if (!DateTimeHelper.isDate(fecha)) {
+        return res.status(400).send('Fecha inválida');
+    }
 
-  return res.status(200).send({ valido: true });
+    return res.status(200).send({ valido: true });
 });
+
+app.get('/fechas/getEdadActual', (req, res) => {
+
+    const fechaNac = ValidacionesHelper.getDateOrDefault(req.query.fechaNacimiento, null);
+
+    if (!DateTimeHelper.isDate(fechaNac)) {
+        return res.status(400).send('Fecha inválida');
+    }
+
+    const edad = DateTimeHelper.getEdadActual(fechaNac);
+
+    return res.status(200).send({ edad: edad });
+});
+
+app.get('/fechas/getDiasHastaMiCumple', (req, res) => {
+
+    const fechaNac = ValidacionesHelper.getDateOrDefault(req.query.fechaNacimiento, null);
+
+    if (!DateTimeHelper.isDate(fechaNac)) {
+        return res.status(400).send('Fecha inválida');
+    }
+
+    const dias = DateTimeHelper.getDiasHastaMiCumple(fechaNac);
+
+    return res.status(200).send({ diasRestantes: dias });
+});
+
+app.get('/fechas/getDiaTexto', (req, res) => {
+
+    const fechaStr = ValidacionesHelper.getStringOrDefault(req.query.fecha, '');
+    const abr = ValidacionesHelper.getBooleanOrDefault(req.query.abr, false);
+
+    if (fechaStr === '') {
+        return res.status(400).send('Fecha inválida');
+    }
+
+    const [anio, mes, dia] = fechaStr.split('-').map(Number);
+    const fecha = new Date(anio, mes - 1, dia);
+
+    if (!DateTimeHelper.isDate(fecha) || fecha.getFullYear() !== anio || fecha.getMonth() !== mes - 1 || fecha.getDate() !== dia
+    ) {
+        return res.status(400).send('Fecha inválida');
+    }
+
+    const diaTexto = DateTimeHelper.getDiaTexto(fecha, abr);
+
+    return res.status(200).send({ dia: diaTexto });
+});
+
+app.get('/fechas/getMesTexto', (req, res) => {
+
+    const fechaStr = ValidacionesHelper.getStringOrDefault(req.query.fecha, '');
+    const abr = ValidacionesHelper.getBooleanOrDefault(req.query.abr, false);
+
+    if (fechaStr === '') {
+        return res.status(400).send('Fecha inválida');
+    }
+
+    const [anio, mes, dia] = fechaStr.split('-').map(Number);
+    const fecha = new Date(anio, mes - 1, dia);
+
+    if (
+        !DateTimeHelper.isDate(fecha) ||
+        fecha.getFullYear() !== anio ||
+        fecha.getMonth() !== mes - 1 ||
+        fecha.getDate() !== dia
+    ) {
+        return res.status(400).send('Fecha inválida');
+    }
+
+    const mesTexto = DateTimeHelper.getMesTexto(fecha, abr);
+
+    return res.status(200).send({ mes: mesTexto });
+});
+
 //
 // Inicio el Server y lo pongo a escuchar.
 //
